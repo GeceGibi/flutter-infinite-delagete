@@ -1,4 +1,4 @@
-library flutter_infinite_delegate;
+library infinite_list_delegate;
 
 import 'dart:async';
 import 'dart:math';
