@@ -6,16 +6,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
-  static Widget _defaultSeparatedBuilder(BuildContext context, int index) {
-    return const SizedBox.shrink();
-  }
-
   InfiniteChildBuilderDelegate({
     required this.itemCount,
     required this.itemBuilder,
     required this.onInfinite,
     this.canInfinite = true,
-    this.separatorBuilder = _defaultSeparatedBuilder,
+    this.separatorBuilder,
     this.endOfListWidget = const SizedBox.shrink(),
     this.progressIndicator = const Padding(
       padding: EdgeInsets.symmetric(vertical: 40),
@@ -23,9 +19,13 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
     ),
   }) : super(
           (context, index) {},
-          childCount: math.max(0, itemCount * 2) + 1,
+          childCount: separatorBuilder != null
+              ? math.max(0, itemCount * 2) + 1
+              : itemCount,
           semanticIndexCallback: (_, index) {
-            return index.isEven ? index ~/ 2 : null;
+            if (separatorBuilder != null) {
+              return index.isEven ? index ~/ 2 : null;
+            }
           },
           addRepaintBoundaries: true,
           addAutomaticKeepAlives: true,
@@ -34,7 +34,7 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
 
   final Future<void> Function() onInfinite;
   final Widget Function(BuildContext context, int index) itemBuilder;
-  final Widget Function(BuildContext context, int index) separatorBuilder;
+  final Widget Function(BuildContext context, int index)? separatorBuilder;
   final int itemCount;
 
   final Widget progressIndicator;
@@ -58,7 +58,7 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
 
   @override
   NullableIndexedWidgetBuilder get builder => (context, i) {
-        final index = i ~/ 2;
+        final index = separatorBuilder != null ? i ~/ 2 : i;
 
         if (index >= itemCount) {
           if (canInfinite) {
@@ -69,10 +69,10 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
           return endOfListWidget;
         }
 
-        if (i.isEven) {
+        if (separatorBuilder == null || i.isEven) {
           return itemBuilder(context, index);
         }
 
-        return separatorBuilder(context, index);
+        return separatorBuilder!(context, index);
       };
 }
