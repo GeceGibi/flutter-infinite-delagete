@@ -15,7 +15,7 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
     required this.itemBuilder,
     required this.onInfinite,
     this.canInfinite = true,
-    this.separatedBuilder = _defaultSeparatedBuilder,
+    this.separatorBuilder = _defaultSeparatedBuilder,
     this.endOfListWidget = const SizedBox.shrink(),
     this.progressIndicator = const Padding(
       padding: EdgeInsets.symmetric(vertical: 40),
@@ -34,7 +34,7 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
 
   final Future<void> Function() onInfinite;
   final Widget Function(BuildContext context, int index) itemBuilder;
-  final Widget Function(BuildContext context, int index) separatedBuilder;
+  final Widget Function(BuildContext context, int index) separatorBuilder;
   final int itemCount;
 
   final Widget progressIndicator;
@@ -73,6 +73,6 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
           return itemBuilder(context, index);
         }
 
-        return separatedBuilder(context, index);
+        return separatorBuilder(context, index);
       };
 }
