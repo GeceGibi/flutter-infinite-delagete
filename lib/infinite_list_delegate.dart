@@ -10,26 +10,47 @@ class InfiniteChildBuilderDelegate extends SliverChildBuilderDelegate {
     required this.itemCount,
     required this.itemBuilder,
     required this.onInfinite,
-    this.canInfinite = true,
     this.separatorBuilder,
+
+    ///
+    this.canInfinite = true,
     this.endOfListWidget = const SizedBox.shrink(),
     this.progressIndicator = const Padding(
       padding: EdgeInsets.symmetric(vertical: 40),
       child: Center(child: CircularProgressIndicator.adaptive()),
     ),
+
+    /// --
+    int semanticIndexOffset = 0,
+    bool addSemanticIndexes = true,
+    bool addRepaintBoundaries = true,
+    bool addAutomaticKeepAlives = true,
+    int? Function(Key)? findChildIndexCallback,
+    int? Function(Widget, int)? semanticIndexCallback,
   }) : super(
-          (context, index) {},
+          (context, index) {
+            /// Will override
+            return null;
+          },
           childCount: separatorBuilder != null
               ? math.max(0, itemCount * 2) + 1
-              : itemCount,
-          semanticIndexCallback: (_, index) {
+              : itemCount + 1,
+          semanticIndexCallback: (widget, index) {
+            if (semanticIndexCallback != null) {
+              return semanticIndexCallback(widget, index);
+            }
+
             if (separatorBuilder != null) {
               return index.isEven ? index ~/ 2 : null;
             }
+
+            return index;
           },
-          addRepaintBoundaries: true,
-          addAutomaticKeepAlives: true,
-          addSemanticIndexes: true,
+          semanticIndexOffset: semanticIndexOffset,
+          addSemanticIndexes: addSemanticIndexes,
+          addRepaintBoundaries: addRepaintBoundaries,
+          addAutomaticKeepAlives: addAutomaticKeepAlives,
+          findChildIndexCallback: findChildIndexCallback,
         );
 
   final Future<void> Function() onInfinite;
